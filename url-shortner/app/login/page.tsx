@@ -1,6 +1,7 @@
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createSessionToken, isValidPassword, isValidSessionToken, SESSION_COOKIE_NAME } from "@/lib/auth";
+import { pickRandomTheme } from "@/lib/background-themes";
 import {
   clearLoginFailures,
   getClientIp,
@@ -61,6 +62,7 @@ async function loginAction(formData: FormData) {
 }
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const theme = pickRandomTheme();
   const sessionStore = await cookies();
   const sessionToken = sessionStore.get(SESSION_COOKIE_NAME)?.value;
 
@@ -77,11 +79,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=2200&q=80')",
+          backgroundImage: `url('${theme.imageUrl}')`,
         }}
       />
-      <div className="absolute inset-0 bg-[linear-gradient(130deg,rgba(7,18,38,0.9)_0%,rgba(21,43,90,0.66)_48%,rgba(10,98,132,0.62)_100%)]" />
+      <div className={`absolute inset-0 ${theme.overlayClass}`} />
 
       <main className="fade-up fade-delay-1 relative z-10 w-full max-w-md rounded-3xl border border-white/25 bg-white/10 p-6 shadow-[0_30px_70px_-32px_rgba(0,0,0,0.7)] backdrop-blur-xl md:p-8">
         <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-100">Admin Access</p>

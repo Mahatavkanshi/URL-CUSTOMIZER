@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { isValidSessionToken, SESSION_COOKIE_NAME } from "@/lib/auth";
+import { pickRandomTheme } from "@/lib/background-themes";
 import { prisma } from "@/lib/prisma";
 
 const CUSTOM_CODE_REGEX = /^[a-zA-Z0-9_-]{4,32}$/;
@@ -149,6 +150,7 @@ const statusMessageMap: Record<string, { tone: "success" | "error"; text: string
 };
 
 export default async function LinksPage({ searchParams }: LinksPageProps) {
+  const theme = pickRandomTheme();
   const sessionStore = await cookies();
   const sessionToken = sessionStore.get(SESSION_COOKIE_NAME)?.value;
 
@@ -203,11 +205,10 @@ export default async function LinksPage({ searchParams }: LinksPageProps) {
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=2200&q=80')",
+          backgroundImage: `url('${theme.imageUrl}')`,
         }}
       />
-      <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(7,18,38,0.9)_0%,rgba(21,43,90,0.72)_48%,rgba(10,98,132,0.55)_100%)]" />
+      <div className={`absolute inset-0 ${theme.overlayClass}`} />
 
       <main className="fade-up fade-delay-1 relative z-10 mx-auto w-full max-w-6xl rounded-3xl border border-white/25 bg-white/10 p-6 shadow-[0_30px_70px_-32px_rgba(0,0,0,0.75)] backdrop-blur-xl md:p-10">
         <div className="fade-up fade-delay-2 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

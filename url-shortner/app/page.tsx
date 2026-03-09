@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { BACKGROUND_THEMES, pickRandomTheme } from "@/lib/background-themes";
 
 type CreateResponse = {
   shortUrl: string;
@@ -54,12 +55,14 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [redirectError, setRedirectError] = useState<string | null>(null);
   const [toast, setToast] = useState("");
+  const [theme, setTheme] = useState(BACKGROUND_THEMES[0]);
 
   const shortCodePreview = useMemo(() => customCode.trim(), [customCode]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setRedirectError(params.get("error"));
+    setTheme(pickRandomTheme());
   }, []);
 
   useEffect(() => {
@@ -122,11 +125,10 @@ export default function Home() {
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1472120435266-53107fd0c44a?auto=format&fit=crop&w=2200&q=80')",
+          backgroundImage: `url('${theme.imageUrl}')`,
         }}
       />
-      <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(9,18,37,0.88)_0%,rgba(21,43,90,0.62)_45%,rgba(18,135,126,0.5)_100%)]" />
+      <div className={`absolute inset-0 ${theme.overlayClass}`} />
 
       <header className="fade-up relative z-10 border-b border-white/20 bg-black/15 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-4 md:px-8">

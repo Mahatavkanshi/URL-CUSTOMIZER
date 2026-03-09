@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { pickRandomTheme } from "@/lib/background-themes";
 
 type ExpiredPageProps = {
   searchParams: Promise<{ code?: string }>;
 };
 
 export default async function ExpiredPage({ searchParams }: ExpiredPageProps) {
+  const theme = pickRandomTheme();
   const { code } = await searchParams;
 
   return (
@@ -12,11 +14,10 @@ export default async function ExpiredPage({ searchParams }: ExpiredPageProps) {
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1493244040629-496f6d136cc3?auto=format&fit=crop&w=2200&q=80')",
+          backgroundImage: `url('${theme.imageUrl}')`,
         }}
       />
-      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(15,23,42,0.9)_0%,rgba(124,45,18,0.6)_48%,rgba(180,83,9,0.48)_100%)]" />
+      <div className={`absolute inset-0 ${theme.overlayClass}`} />
 
       <main className="fade-up relative z-10 w-full max-w-xl rounded-3xl border border-white/25 bg-white/12 p-6 shadow-[0_30px_70px_-32px_rgba(0,0,0,0.75)] backdrop-blur-xl md:p-8">
         <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-100">Link Status</p>
