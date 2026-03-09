@@ -1,36 +1,110 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# URL Customizer (URL Shortener)
 
-## Getting Started
+A modern URL shortener built with Next.js + PostgreSQL + Prisma.
 
-First, run the development server:
+## Features
+
+- Create short URLs with optional custom slug
+- Redirect using dynamic short code route
+- Click tracking per short URL
+- Optional expiration date for each link
+- Expired-link fallback page
+- Admin login to manage links
+- Edit/delete links from dashboard
+- Search and pagination in analytics table
+- Copy short URL, QR code generation, and UTM presets
+- API rate limiting (Redis-backed when `REDIS_URL` is configured)
+
+## Tech Stack
+
+- Next.js (App Router, TypeScript)
+- Prisma ORM
+- PostgreSQL
+- ioredis (optional Redis rate limiting)
+- Tailwind CSS (via `@import "tailwindcss"`)
+
+## Quick Start
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Create env file from template:
+
+```bash
+# macOS/Linux
+cp .env.example .env
+
+# Windows (PowerShell)
+copy .env.example .env
+```
+
+3. Update `.env` values:
+
+- `DATABASE_URL`
+- `ADMIN_PASSWORD_HASH`
+- `AUTH_SECRET`
+- `REDIS_URL` (optional)
+
+4. Generate Prisma client / run migrations:
+
+```bash
+npx prisma migrate dev
+npx prisma generate
+```
+
+5. Start development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Create Admin Password Hash
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Use the helper script:
 
-## Learn More
+```bash
+npm run hash:password -- "your-strong-password"
+```
 
-To learn more about Next.js, take a look at the following resources:
+Copy the `ENV value:` output into `.env` as `ADMIN_PASSWORD_HASH`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Environment Safety (Important)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `.env` is ignored by git in `.gitignore`
+- `.env.*` is ignored by git
+- Only `.env.example` is tracked for GitHub
 
-## Deploy on Vercel
+This prevents secrets from being pushed to GitHub.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Screenshots
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Home Page
+![Home Page](docs/home.png)
+
+### Admin Dashboard
+![Admin Dashboard](docs/admin.png)
+
+### QR Preview
+![QR Preview](docs/qr.png)
+
+## Useful Routes
+
+- `/` Home + create short URL
+- `/login` Admin login
+- `/links` Link management dashboard
+- `/expired` Expired link fallback page
+- `/api/shorten` Create short URL API
+- `/api/health` App/DB/rate-limit health check
+
+## Scripts
+
+- `npm run dev` - Start local development server
+- `npm run build` - Build for production
+- `npm run start` - Start production build
+- `npm run lint` - Run ESLint
+- `npm run hash:password -- "..."` - Generate bcrypt hash for admin password
