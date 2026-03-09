@@ -17,7 +17,9 @@ export async function GET(request: Request, context: RouteContext) {
   }
 
   if (existingUrl.expiresAt && existingUrl.expiresAt.getTime() <= Date.now()) {
-    return NextResponse.redirect(new URL("/?error=expired", request.url));
+    return NextResponse.redirect(
+      new URL(`/expired?code=${encodeURIComponent(shortCode)}`, request.url),
+    );
   }
 
   await prisma.url.update({

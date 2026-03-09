@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
@@ -10,14 +11,49 @@ type CreateResponse = {
   expiresAt: string | null;
 };
 
+type UtmPreset = "none" | "instagram" | "whatsapp" | "email";
+
+function appendUtmParams(inputUrl: string, preset: UtmPreset): string {
+  if (preset === "none") {
+    return inputUrl;
+  }
+
+  const withProtocol = /^https?:\/\//i.test(inputUrl.trim())
+    ? inputUrl.trim()
+    : `https://${inputUrl.trim()}`;
+  const parsed = new URL(withProtocol);
+
+  if (preset === "instagram") {
+    parsed.searchParams.set("utm_source", "instagram");
+    parsed.searchParams.set("utm_medium", "social");
+    parsed.searchParams.set("utm_campaign", "bio_link");
+  }
+
+  if (preset === "whatsapp") {
+    parsed.searchParams.set("utm_source", "whatsapp");
+    parsed.searchParams.set("utm_medium", "chat");
+    parsed.searchParams.set("utm_campaign", "direct_share");
+  }
+
+  if (preset === "email") {
+    parsed.searchParams.set("utm_source", "email");
+    parsed.searchParams.set("utm_medium", "newsletter");
+    parsed.searchParams.set("utm_campaign", "weekly_update");
+  }
+
+  return parsed.toString();
+}
+
 export default function Home() {
   const [originalUrl, setOriginalUrl] = useState("");
   const [customCode, setCustomCode] = useState("");
   const [expiresAt, setExpiresAt] = useState("");
+  const [utmPreset, setUtmPreset] = useState<UtmPreset>("none");
   const [result, setResult] = useState<CreateResponse | null>(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [redirectError, setRedirectError] = useState<string | null>(null);
+  const [toast, setToast] = useState("");
 
   const shortCodePreview = useMemo(() => customCode.trim(), [customCode]);
 
@@ -26,17 +62,41 @@ export default function Home() {
     setRedirectError(params.get("error"));
   }, []);
 
+  useEffect(() => {
+    if (!toast) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => setToast(""), 2500);
+    return () => window.clearTimeout(timeout);
+  }, [toast]);
+
+  async function handleCopyShortUrl() {
+    if (!result) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(result.shortUrl);
+      setToast("Short URL copied");
+    } catch {
+      setToast("Copy failed. Please copy manually.");
+    }
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
     setError("");
 
     try {
+      const originalUrlWithPreset = appendUtmParams(originalUrl, utmPreset);
+
       const response = await fetch("/api/shorten", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          originalUrl,
+          originalUrl: originalUrlWithPreset,
           customCode,
           expiresAt,
         }),
@@ -133,6 +193,16 @@ export default function Home() {
               onChange={(event) => setExpiresAt(event.target.value)}
               className="w-full rounded-xl border border-white/30 bg-white/95 px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200"
             />
+            <select
+              value={utmPreset}
+              onChange={(event) => setUtmPreset(event.target.value as UtmPreset)}
+              className="w-full rounded-xl border border-white/30 bg-white/95 px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200"
+            >
+              <option value="none">No UTM preset</option>
+              <option value="instagram">Instagram preset</option>
+              <option value="whatsapp">WhatsApp preset</option>
+              <option value="email">Email preset</option>
+            </select>
 
             <div className="rounded-xl border border-cyan-100/30 bg-black/20 px-4 py-2 text-xs text-cyan-100">
               Preview: {typeof window !== "undefined" ? window.location.origin : "your-domain"}/
@@ -177,16 +247,47 @@ export default function Home() {
               >
                 {result.shortUrl}
               </a>
+              <button
+                type="button"
+                onClick={handleCopyShortUrl}
+                className="mt-2 rounded-lg bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-600"
+              >
+                Copy short URL
+              </button>
               <p className="mt-1 text-xs text-emerald-900/90">Redirects to: {result.originalUrl}</p>
               {result.expiresAt ? (
                 <p className="mt-1 text-xs text-emerald-900/90">
                   Expires at: {new Date(result.expiresAt).toLocaleString()}
                 </p>
               ) : null}
+              <div className="mt-3">
+                <p className="text-xs font-semibold text-emerald-900">QR Code</p>
+                <Image
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(result.shortUrl)}`}
+                  alt="Short URL QR code"
+                  width={112}
+                  height={112}
+                  className="mt-2 h-28 w-28 rounded-lg border border-emerald-300 bg-white p-1"
+                />
+                <a
+                  href={`https://api.qrserver.com/v1/create-qr-code/?size=512x512&data=${encodeURIComponent(result.shortUrl)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-2 inline-block text-xs font-semibold text-emerald-800 underline underline-offset-4"
+                >
+                  Open high-res QR
+                </a>
+              </div>
             </section>
           ) : null}
         </section>
       </main>
+
+      {toast ? (
+        <div className="pointer-events-none fixed bottom-5 right-5 z-20 rounded-lg border border-cyan-200/70 bg-cyan-100/95 px-4 py-2 text-sm font-semibold text-cyan-800 shadow-lg">
+          {toast}
+        </div>
+      ) : null}
     </div>
   );
 }
