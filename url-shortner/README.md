@@ -45,6 +45,7 @@ copy .env.example .env
 
 - `DATABASE_URL`
 - `ADMIN_PASSWORD_HASH`
+- `ADMIN_PASSWORD` (optional fallback for quick setup)
 - `AUTH_SECRET`
 - `REDIS_URL` (optional)
 
