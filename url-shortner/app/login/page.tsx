@@ -47,10 +47,16 @@ async function loginAction(formData: FormData) {
 
   await clearLoginFailures(clientIp);
 
+  const sessionToken = createSessionToken();
+
+  if (!sessionToken) {
+    redirect("/login?error=config");
+  }
+
   const sessionStore = await cookies();
   sessionStore.set({
     name: SESSION_COOKIE_NAME,
-    value: createSessionToken(),
+    value: sessionToken,
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
@@ -100,6 +106,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         {error === "unauthorized" ? (
           <p className="mt-4 rounded-xl border border-rose-200/70 bg-rose-100/95 px-4 py-3 text-sm font-medium text-rose-700">
             Please login to continue.
+          </p>
+        ) : null}
+
+        {error === "config" ? (
+          <p className="mt-4 rounded-xl border border-rose-200/70 bg-rose-100/95 px-4 py-3 text-sm font-medium text-rose-700">
+            Login is not configured on this deployment. Set ADMIN_PASSWORD_HASH.
           </p>
         ) : null}
 
