@@ -97,7 +97,7 @@ This prevents secrets from being pushed to GitHub.
     <td align="center" colspan="2"><strong>QR Preview</strong></td>
   </tr>
   <tr>
-    <td colspan="2"><img src="docs/qr.png" alt="QR Preview" width="980" /></td>
+    <td colspan="2"><img src="docs/qr.png" alt="QR Preview" width="640" /></td>
   </tr>
 </table>
 

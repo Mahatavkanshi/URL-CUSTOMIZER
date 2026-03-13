@@ -32,6 +32,6 @@ Open `http://localhost:3000`.
     <td align="center" colspan="2"><strong>QR Preview</strong></td>
   </tr>
   <tr>
-    <td colspan="2"><img src="url-shortner/docs/qr.png" alt="QR Preview" width="980" /></td>
+    <td colspan="2"><img src="url-shortner/docs/qr.png" alt="QR Preview" width="640" /></td>
   </tr>
 </table>
