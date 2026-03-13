@@ -84,14 +84,22 @@ This prevents secrets from being pushed to GitHub.
 
 ## Screenshots
 
-### Home Page
-![Home Page](docs/home.png)
-
-### Admin Dashboard
-![Admin Dashboard](docs/admin.png)
-
-### QR Preview
-![QR Preview](docs/qr.png)
+<table>
+  <tr>
+    <td align="center"><strong>Home Page</strong></td>
+    <td align="center"><strong>Admin Dashboard</strong></td>
+  </tr>
+  <tr>
+    <td><img src="docs/home.png" alt="Home Page" width="480" /></td>
+    <td><img src="docs/admin.png" alt="Admin Dashboard" width="480" /></td>
+  </tr>
+  <tr>
+    <td align="center" colspan="2"><strong>QR Preview</strong></td>
+  </tr>
+  <tr>
+    <td colspan="2"><img src="docs/qr.png" alt="QR Preview" width="980" /></td>
+  </tr>
+</table>
 
 ## Useful Routes
 
